@@ -5,17 +5,17 @@
 
 typedef layer22_t result_t;
 
-#if 0
-static const unsigned N_IN = 128;
-static const unsigned N_OUT = 128;
-typedef ap_fixed<8,8> input_axi_t;
-typedef ap_fixed<8,8> output_axi_t;
-
-void anomaly_detector_axi(
-    input_axi_t in[N_IN],
-    output_axi_t out[N_OUT]
-        );
-#else
+//#if 0
+//static const unsigned N_IN = 128;
+//static const unsigned N_OUT = 128;
+//typedef ap_fixed<8,8> input_axi_t;
+//typedef ap_fixed<8,8> output_axi_t;
+//
+//void anomaly_detector_axi(
+//    input_axi_t in[N_IN],
+//    output_axi_t out[N_OUT]
+//        );
+//#else
 #define CEILING_DIV(x, y) (((x) + (y) - 1) / (y) )
 
 // Model dimensions
@@ -50,4 +50,4 @@ void anomaly_detector_axi(
 );
 
 #endif
-#endif
+//#endif

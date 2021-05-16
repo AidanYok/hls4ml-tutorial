@@ -1,34 +1,34 @@
 #include "anomaly_detector_axi.h"
 
-#if 0
-void anomaly_detector_axi(
-        input_axi_t in[N_IN],
-        output_axi_t out[N_OUT]
-        ){
-
-#pragma HLS INTERFACE s_axilite port=return bundle=CTRL_BUS
-#pragma HLS INTERFACE m_axi depth=N_IN port=in offset=slave bundle=IN_BUS
-#pragma HLS INTERFACE m_axi depth=N_OUT port=out offset=slave bundle=OUT_BUS
-
-    unsigned short in_size = 0;
-    unsigned short out_size = 0;
-
-    input_t in_local[N_IN];
-    result_t out_local[N_OUT];
-
-    for(unsigned i = 0; i < N_IN; i++){
-#pragma HLS UNROLL
-        in_local[i] = in[i]; // Read input with cast
-    }
-
-    anomaly_detector(in_local, out_local, in_size, out_size);
-
-    for(unsigned i = 0; i < N_OUT; i++){
-#pragma HLS UNROLL
-        out[i] = out_local[i]; // Write output with cast
-    }
-}
-#else
+//#if 0
+//void anomaly_detector_axi(
+//        input_axi_t in[N_IN],
+//        output_axi_t out[N_OUT]
+//        ){
+//
+//#pragma HLS INTERFACE s_axilite port=return bundle=CTRL_BUS
+//#pragma HLS INTERFACE m_axi depth=N_IN port=in offset=slave bundle=IN_BUS
+//#pragma HLS INTERFACE m_axi depth=N_OUT port=out offset=slave bundle=OUT_BUS
+//
+//    unsigned short in_size = 0;
+//    unsigned short out_size = 0;
+//
+//    input_t in_local[N_IN];
+//    result_t out_local[N_OUT];
+//
+//    for(unsigned i = 0; i < N_IN; i++){
+//#pragma HLS UNROLL
+//        in_local[i] = in[i]; // Read input with cast
+//    }
+//
+//    anomaly_detector(in_local, out_local, in_size, out_size);
+//
+//    for(unsigned i = 0; i < N_OUT; i++){
+//#pragma HLS UNROLL
+//        out[i] = out_local[i]; // Write output with cast
+//    }
+//}
+//#else
 
 void load_axi(input_axi_t axi_in_local[AXI_DEPTH_IN], input_axi_t in[AXI_DEPTH_IN * 197], unsigned b) {
 #pragma HLS INLINE off
@@ -138,45 +138,45 @@ BATCH:
 //#pragma HLS DATAFLOW // issue: race conditions
         if (b >= batch) break;
 
-#if 0
-LOAD:
-        {
-#pragma HLS INLINE off
-            for (unsigned i = 0; i < AXI_DEPTH_IN; i++) {
-#pragma HLS UNROLL
-                input_axi_t axi_data = in[b * N_IN + i];
-                for (unsigned j = 0; j < W_COUNT_IN; j++) {
-#pragma HLS UNROLL
-                    input_t data;
-                    data.range(W_IN-1, 0) = axi_data.range(((j+1)*W_IN)-1, j*W_IN);
-                    model_in[i * W_COUNT_IN + j].range(W_IN- 1, 0) = data.range(W_IN-1, 0);
-                }
-            }
-        }
-#else
+//#if 0
+//LOAD:
+//        {
+//#pragma HLS INLINE off
+//            for (unsigned i = 0; i < AXI_DEPTH_IN; i++) {
+//#pragma HLS UNROLL
+//                input_axi_t axi_data = in[b * N_IN + i];
+//                for (unsigned j = 0; j < W_COUNT_IN; j++) {
+//#pragma HLS UNROLL
+//                    input_t data;
+//                    data.range(W_IN-1, 0) = axi_data.range(((j+1)*W_IN)-1, j*W_IN);
+//                    model_in[i * W_COUNT_IN + j].range(W_IN- 1, 0) = data.range(W_IN-1, 0);
+//                }
+//            }
+//        }
+//#else
 
         load(model_in, in, b);
 
-#endif
+//#endif
 
         anomaly_detector(model_in, model_out, in_size, out_size);
 
-#if 0
-STORE:
-        {
-#pragma HLS INLINE off
-            for (unsigned i = 0; i < AXI_DEPTH_OUT; i++) {
-#pragma HLS UNROLL
-                output_axi_t axi_data;
-                for (unsigned j = 0; j < W_COUNT_OUT; j++) {
-#pragma HLS UNROLL
-                    result_t data = model_out[i * W_COUNT_OUT + j];
-                    axi_data.range(((j+1)*W_OUT)-1, j*W_OUT) = data.range(W_OUT-1, 0);
-                }
-                out[b * N_OUT + i] = axi_data;
-            }
-        }
-#else
+//#if 0
+//STORE:
+//        {
+//#pragma HLS INLINE off
+//            for (unsigned i = 0; i < AXI_DEPTH_OUT; i++) {
+//#pragma HLS UNROLL
+//                output_axi_t axi_data;
+//                for (unsigned j = 0; j < W_COUNT_OUT; j++) {
+//#pragma HLS UNROLL
+//                    result_t data = model_out[i * W_COUNT_OUT + j];
+//                    axi_data.range(((j+1)*W_OUT)-1, j*W_OUT) = data.range(W_OUT-1, 0);
+//                }
+//                out[b * N_OUT + i] = axi_data;
+//            }
+//        }
+//#else
 
        store(out, model_out, b);
 
@@ -184,4 +184,4 @@ STORE:
     }
 
 }
-#endif
+//#endif
